@@ -1,0 +1,38 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "IntegrateAuthNameSpace";
+
+package IntegrateAuthPackage;
+
+
+// 整合驗證服務
+service IntegrateAuthGrpcService {
+// 驗證Token
+rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenReply);
+
+}
+// 驗證Token Request
+message ValidateTokenRequest {
+// user token
+string userToken=1;
+}
+
+// 驗證Token Reply
+message ValidateTokenReply {
+	// 是否驗證成功
+	bool valid = 2;
+// claims
+repeated ValidateTokenClaimItem claims = 1;
+}
+// claim
+message ValidateTokenClaimItem {
+// key
+ string key = 1;
+// value
+ string value = 2;
+ // valueType
+ string valueType = 3;
+}
+
+
+
