@@ -3,6 +3,7 @@ using IntegrateAuthNameSpace;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Net.Http.Headers;
 
 namespace SampleAuthWebApp.Services
 {
@@ -21,7 +22,7 @@ namespace SampleAuthWebApp.Services
             var userToken = request.UserToken;
 
             var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers.Add("Authorization", userToken);
+            httpContext.Request.Headers.Add(HeaderNames.Authorization, userToken);
             httpContext.ServiceScopeFactory = _serviceScopeFactory;
             var authenticateResult = await httpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
 

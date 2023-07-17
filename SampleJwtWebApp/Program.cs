@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using SampleJwtWebApp.Auths;
+using SecureTokenHome;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -24,7 +26,7 @@ namespace SampleJwtWebApp
                 })
                 .AddCallCredentials((context, metadata) =>
                 {
-                    metadata.Add("Authorization", $"Bearer {GetServerToken()}");
+                    metadata.Add(HeaderNames.Authorization, $"{SecureTokenHelper.ServerBearer} {SecureTokenHelper.GetServerToken()}");
                     return Task.CompletedTask;
                 });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -79,44 +81,6 @@ namespace SampleJwtWebApp
             app.MapControllers();
 
             app.Run();
-        }
-
-
-        private static string CreateToken(SymmetricSecurityKey signingKey, List<Claim> claims)
-        {
-            var jwtSecurityToken = new JwtSecurityToken(
-                issuer: "https://localhost:7256",
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-        }
-
-        static string GetServerToken()
-        {
-            var signingKey = new SymmetricSecurityKey(Program.GetSecretKey());
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, "serverId"),
-                new Claim(ClaimTypes.Role, "Server"),
-            };
-            AddAud(claims);
-
-            return CreateToken(signingKey, claims);
-        }
-        private static void AddAud(List<Claim> claims)
-        {
-            claims.Add(new Claim(JwtRegisteredClaimNames.Aud, "https://localhost:7256"));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Aud, "https://localhost:7136"));
-        }
-        public static byte[] GetSecretKey()
-        {
-            var bytes = Encoding.UTF8.GetBytes("askjdhf98asdf9h25khns;lzdfh98sddfbu;12kjaiodhjgo;aihew4t-89q34nop;asdok;fg");
-            Array.Resize(ref bytes, 64);
-            return bytes;
         }
 
     }

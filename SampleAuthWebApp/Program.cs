@@ -1,7 +1,12 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using SampleAuthWebApp.Auths;
 using SampleAuthWebApp.Services;
+using SecureTokenHome;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -19,8 +24,24 @@ namespace SampleAuthWebApp
             builder.Services.AddControllers();
             builder.Services.AddGrpc();
 
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-           .AddJwtBearer(options =>
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "User_Or_Server";
+                options.DefaultChallengeScheme = "User_Or_Server";
+            })
+           .AddPolicyScheme("User_Or_Server", "User_Or_Server", options =>
+           {
+               options.ForwardDefaultSelector = context =>
+               {
+                   string authorization = context.Request.Headers[HeaderNames.Authorization];
+                   if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith(SecureTokenHelper.ServerBearer))
+                   {
+                       return SecureTokenHelper.ServerBearer;
+                   }
+                   return JwtBearerDefaults.AuthenticationScheme;
+               };
+           })
+           .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, JwtBearerDefaults.AuthenticationScheme, options =>
            {
                options.TokenValidationParameters = new TokenValidationParameters
                {
@@ -28,11 +49,28 @@ namespace SampleAuthWebApp
                    ValidateAudience = true,
                    ValidateLifetime = true,
                    ValidateIssuerSigningKey = true,
-                   ValidIssuer = "https://localhost:7256",
-                   ValidAudiences = new string[] { "https://localhost:7256", "https://localhost:7136" },
+                   ValidIssuer = SecureTokenHelper.Issuer,
+                   ValidAudiences = SecureTokenHelper.Audiences,
                    IssuerSigningKeyResolver = (string unvalidToken, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
                    {
-                       return new[] { new SymmetricSecurityKey(GetSecretKey()) };
+                       return new[] { new SymmetricSecurityKey(SecureTokenHelper.GetClientSecretKey()) };
+                   },
+                   ClockSkew = TimeSpan.Zero
+               };
+           })
+           .AddScheme<JwtBearerOptions, ServerTokenAuthenticationHandler2>(SecureTokenHelper.ServerBearer, SecureTokenHelper.ServerBearer, options =>
+           {
+               options.TokenValidationParameters = new TokenValidationParameters
+               {
+                   ValidateIssuer = true,
+                   ValidateAudience = true,
+                   ValidateLifetime = true,
+                   ValidateIssuerSigningKey = true,
+                   ValidIssuer = SecureTokenHelper.Issuer,
+                   ValidAudiences = SecureTokenHelper.Audiences,
+                   IssuerSigningKeyResolver = (string unvalidToken, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
+                   {
+                       return new[] { new SymmetricSecurityKey(SecureTokenHelper.GetServerSecretKey()) };
                    },
                    ClockSkew = TimeSpan.Zero
                };
@@ -44,13 +82,13 @@ namespace SampleAuthWebApp
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SampleAuthWebApp Api", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                    Name = "Authorization",
+                    Description = $"\"Authorization: {JwtBearerDefaults.AuthenticationScheme} {{token}}\" or \"Authorization: {SecureTokenHelper.ServerBearer} {{token}}\"",
+                    Name = HeaderNames.Authorization,
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
+                    Scheme = JwtBearerDefaults.AuthenticationScheme
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
@@ -88,57 +126,6 @@ namespace SampleAuthWebApp
             app.Run();
         }
 
-        public static byte[] GetSecretKey()
-        {
-            var bytes = Encoding.UTF8.GetBytes("askjdhf98asdf9h25khns;lzdfh98sddfbu;12kjaiodhjgo;aihew4t-89q34nop;asdok;fg");
-            Array.Resize(ref bytes, 64);
-            return bytes;
-        }
-
-        public static string GetUserToken()
-        {
-            var signingKey = new SymmetricSecurityKey(GetSecretKey());
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, "userId"),
-                new Claim(ClaimTypes.Role, "User"),
-            };
-            AddAud(claims);
-
-            return CreateToken(signingKey, claims);
-        }
-
-        private static string CreateToken(SymmetricSecurityKey signingKey, List<Claim> claims)
-        {
-            var jwtSecurityToken = new JwtSecurityToken(
-                issuer: "https://localhost:7256",
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-        }
-
-        public static string GetServerToken()
-        {
-            var signingKey = new SymmetricSecurityKey(GetSecretKey());
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, "serverId"),
-                new Claim(ClaimTypes.Role, "Server"),
-            };
-            AddAud(claims);
-
-            return CreateToken(signingKey, claims);
-        }
-        private static void AddAud(List<Claim> claims)
-        {
-            claims.Add(new Claim(JwtRegisteredClaimNames.Aud, "https://localhost:7256"));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Aud, "https://localhost:7136"));
-        }
 
     }
 }

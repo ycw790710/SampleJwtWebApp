@@ -1,6 +1,7 @@
 ﻿using IntegrateAuthNameSpace;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
@@ -20,12 +21,12 @@ namespace SampleJwtWebApp.Auths
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (!Request.Headers.ContainsKey("Authorization"))
+            if (!Request.Headers.ContainsKey(HeaderNames.Authorization))
             {
                 return AuthenticateResult.Fail("Missing or invalid Authorization header.");
             }
 
-            string token = Request.Headers["Authorization"].ToString();
+            string token = Request.Headers[HeaderNames.Authorization].ToString();
 
             var reply = await _integrateAuthGrpcServiceClient.ValidateTokenAsync(new ValidateTokenRequest()
             {

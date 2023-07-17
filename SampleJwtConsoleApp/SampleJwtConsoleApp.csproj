@@ -18,6 +18,10 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SecureTokenHome\SecureTokenHome.csproj" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<Protobuf Include="..\GrpcProtos\IntegrateAuthPackage.proto" GrpcServices="Client" />
 	</ItemGroup>

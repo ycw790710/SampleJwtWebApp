@@ -4,6 +4,7 @@ using IntegrateAuthNameSpace;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using SecureTokenHome;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,10 +18,10 @@ namespace SampleJwtConsoleApp
         {
             var uriAddress = "https://localhost:7256";
 
-            var token = GetServerToken();
+            var token = SecureTokenHelper.GetServerToken();
             var credentials = CallCredentials.FromInterceptor(async (context, metadata) =>
             {
-                metadata.Add("Authorization", $"Bearer {token}");
+                metadata.Add("Authorization", $"{SecureTokenHelper.ServerBearer} {token}");
             });
 
             var handler = new SocketsHttpHandler
@@ -83,7 +84,7 @@ namespace SampleJwtConsoleApp
         {
             var request = new ValidateTokenRequest()
             {
-                UserToken = GetUserToken()
+                UserToken = SecureTokenHelper.GetUserToken()
             };
             var reply = await client.ValidateTokenAsync(request);
 
@@ -172,56 +173,5 @@ namespace SampleJwtConsoleApp
         }
 
 
-
-        static string GetUserToken()
-        {
-            var signingKey = new SymmetricSecurityKey(Program.GetSecretKey());
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, "userId"),
-                new Claim(ClaimTypes.Role, "User"),
-            };
-            AddAud(claims);
-
-            return CreateToken(signingKey, claims);
-        }
-
-        private static string CreateToken(SymmetricSecurityKey signingKey, List<Claim> claims)
-        {
-            var jwtSecurityToken = new JwtSecurityToken(
-                issuer: "https://localhost:7256",
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-        }
-
-        static string GetServerToken()
-        {
-            var signingKey = new SymmetricSecurityKey(Program.GetSecretKey());
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, "serverId"),
-                new Claim(ClaimTypes.Role, "Server"),
-            };
-            AddAud(claims);
-
-            return CreateToken(signingKey, claims);
-        }
-        private static void AddAud(List<Claim> claims)
-        {
-            claims.Add(new Claim(JwtRegisteredClaimNames.Aud, "https://localhost:7256"));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Aud, "https://localhost:7136"));
-        }
-        public static byte[] GetSecretKey()
-        {
-            var bytes = Encoding.UTF8.GetBytes("askjdhf98asdf9h25khns;lzdfh98sddfbu;12kjaiodhjgo;aihew4t-89q34nop;asdok;fg");
-            Array.Resize(ref bytes, 64);
-            return bytes;
-        }
     }
 }

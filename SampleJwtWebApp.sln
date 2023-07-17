@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleAuthWebApp", "SampleA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcProtos", "GrpcProtos\GrpcProtos.csproj", "{72BC5F67-4BA2-458A-AE21-F913C0ABC32F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleJwtConsoleApp", "SampleJwtConsoleApp\SampleJwtConsoleApp.csproj", "{889BD586-ECB8-4054-8077-963B1CB26F1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleJwtConsoleApp", "SampleJwtConsoleApp\SampleJwtConsoleApp.csproj", "{889BD586-ECB8-4054-8077-963B1CB26F1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureTokenHome", "SecureTokenHome\SecureTokenHome.csproj", "{03F423EC-DB07-4D2E-9B03-043E90920FE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{889BD586-ECB8-4054-8077-963B1CB26F1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{889BD586-ECB8-4054-8077-963B1CB26F1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{889BD586-ECB8-4054-8077-963B1CB26F1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03F423EC-DB07-4D2E-9B03-043E90920FE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03F423EC-DB07-4D2E-9B03-043E90920FE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03F423EC-DB07-4D2E-9B03-043E90920FE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03F423EC-DB07-4D2E-9B03-043E90920FE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

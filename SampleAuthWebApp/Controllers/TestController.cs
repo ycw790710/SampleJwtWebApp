@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SecureTokenHome;
 
 namespace SampleAuthWebApp.Controllers
 {
@@ -37,14 +38,14 @@ namespace SampleAuthWebApp.Controllers
         [HttpGet]
         public async Task<ActionResult<string>> GetUserToken()
         {
-            var token = Program.GetUserToken();
+            var token = SecureTokenHelper.GetUserToken();
             return Ok(token);
         }
 
         [HttpGet]
         public async Task<ActionResult<string>> GetServerToken()
         {
-            var token = Program.GetServerToken();
+            var token = SecureTokenHelper.GetServerToken();
             return Ok(token);
         }
 
