@@ -18,10 +18,9 @@ namespace SampleJwtConsoleApp
         {
             var uriAddress = "https://localhost:7256";
 
-            var token = SecretTokenHelper.GetServerToken();
             var credentials = CallCredentials.FromInterceptor(async (context, metadata) =>
             {
-                metadata.Add("Authorization", $"{SecretTokenHelper.ServerBearer} {token}");
+                metadata.Add("Authorization", $"{SecretTokenHelper.ServerBearer} {SecretTokenHelper.GetServerToken()}");
             });
 
             var handler = new SocketsHttpHandler
@@ -44,6 +43,8 @@ namespace SampleJwtConsoleApp
             Console.WriteLine();
 
             await TestGrpcIteration(channel);
+            //await channel.ShutdownAsync();
+            //await channel.ConnectAsync();
             await TestGrpcIteration(channel);
             TestGrpcTasks(channel);
             TestGrpcTasks(channel);

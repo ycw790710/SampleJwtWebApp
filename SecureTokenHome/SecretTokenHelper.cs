@@ -37,7 +37,7 @@ namespace SecureTokenHome
             var jwtSecurityToken = new JwtSecurityToken(
                 issuer: Issuer,
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddSeconds(5),
                 signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
             );
 
