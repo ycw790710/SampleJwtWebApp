@@ -23,25 +23,20 @@ namespace SecureTokenHome
             };
             AddAud(claims);
 
-            return CreateToken(signingKey, claims);
+            var jwtSecurityToken = new JwtSecurityToken(
+                issuer: Issuer,
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
         }
         public static byte[] GetClientSecretKey()
         {
             var bytes = Encoding.UTF8.GetBytes("askjdhf98hjll6yughljasdf9h25khns;lzdfh98sddfbu;12kjaiodhjgo;aihew4t-89q34nop;asdok;fg");
             Array.Resize(ref bytes, 64);
             return bytes;
-        }
-
-        private static string CreateToken(SymmetricSecurityKey signingKey, List<Claim> claims)
-        {
-            var jwtSecurityToken = new JwtSecurityToken(
-                issuer: Issuer,
-                claims: claims,
-                expires: DateTime.Now.AddSeconds(5),
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
         }
 
         public static string GetServerToken()
@@ -55,7 +50,13 @@ namespace SecureTokenHome
             };
             AddAud(claims);
 
-            return CreateToken(signingKey, claims);
+            var jwtSecurityToken = new JwtSecurityToken(
+                issuer: Issuer,
+                claims: claims,
+                expires: DateTime.Now.AddSeconds(5),
+                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
+            );
+            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
         }
         public static byte[] GetServerSecretKey()
         {
