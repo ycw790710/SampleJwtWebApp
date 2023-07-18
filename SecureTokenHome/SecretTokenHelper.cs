@@ -5,12 +5,12 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace SecureTokenHome
 {
-    public class SecureTokenHelper
+    public class SecretTokenHelper
     {
         public static string Issuer { get; private set; } = "SampleJwtWebApp";
         public static string[] Audiences { get; private set; } = new string[] { "SampleJwtWebApp" };
 
-        public static string ServerBearer = "ServerBearer";
+        public static string ServerBearer = "S";
 
         public static string GetUserToken()
         {

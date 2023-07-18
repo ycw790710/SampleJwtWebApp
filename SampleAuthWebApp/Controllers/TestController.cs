@@ -38,14 +38,14 @@ namespace SampleAuthWebApp.Controllers
         [HttpGet]
         public async Task<ActionResult<string>> GetUserToken()
         {
-            var token = SecureTokenHelper.GetUserToken();
+            var token = SecretTokenHelper.GetUserToken();
             return Ok(token);
         }
 
         [HttpGet]
         public async Task<ActionResult<string>> GetServerToken()
         {
-            var token = SecureTokenHelper.GetServerToken();
+            var token = SecretTokenHelper.GetServerToken();
             return Ok(token);
         }
 

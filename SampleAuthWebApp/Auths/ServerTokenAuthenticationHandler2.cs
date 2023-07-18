@@ -25,7 +25,7 @@ namespace SampleAuthWebApp.Auths
                 return AuthenticateResult.Fail("Missing or invalid Authorization header.");
             }
 
-            string token = Request.Headers[HeaderNames.Authorization].ToString().Substring(SecureTokenHelper.ServerBearer.Length).TrimStart();
+            string token = Request.Headers[HeaderNames.Authorization].ToString().Substring(SecretTokenHelper.ServerBearer.Length).TrimStart();
 
             if (!ValidateToken(token, Options.TokenValidationParameters))
             {

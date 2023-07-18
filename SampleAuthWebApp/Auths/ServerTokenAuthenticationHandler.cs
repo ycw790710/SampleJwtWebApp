@@ -25,7 +25,7 @@ namespace SampleAuthWebApp.Auths
                 return AuthenticateResult.Fail("Missing or invalid Authorization header.");
             }
 
-            string token = Request.Headers[HeaderNames.Authorization].ToString().Substring(SecureTokenHelper.ServerBearer.Length).TrimStart();
+            string token = Request.Headers[HeaderNames.Authorization].ToString().Substring(SecretTokenHelper.ServerBearer.Length).TrimStart();
 
             if (!ValidateToken(token))
             {
@@ -55,11 +55,11 @@ namespace SampleAuthWebApp.Auths
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = SecureTokenHelper.Issuer,
-                ValidAudiences = SecureTokenHelper.Audiences,
+                ValidIssuer = SecretTokenHelper.Issuer,
+                ValidAudiences = SecretTokenHelper.Audiences,
                 IssuerSigningKeyResolver = (string unvalidToken, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
                 {
-                    return new[] { new SymmetricSecurityKey(SecureTokenHelper.GetServerSecretKey()) };
+                    return new[] { new SymmetricSecurityKey(SecretTokenHelper.GetServerSecretKey()) };
                 },
                 ClockSkew = TimeSpan.Zero
             };

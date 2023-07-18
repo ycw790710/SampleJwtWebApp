@@ -18,10 +18,10 @@ namespace SampleJwtConsoleApp
         {
             var uriAddress = "https://localhost:7256";
 
-            var token = SecureTokenHelper.GetServerToken();
+            var token = SecretTokenHelper.GetServerToken();
             var credentials = CallCredentials.FromInterceptor(async (context, metadata) =>
             {
-                metadata.Add("Authorization", $"{SecureTokenHelper.ServerBearer} {token}");
+                metadata.Add("Authorization", $"{SecretTokenHelper.ServerBearer} {token}");
             });
 
             var handler = new SocketsHttpHandler
@@ -84,7 +84,7 @@ namespace SampleJwtConsoleApp
         {
             var request = new ValidateTokenRequest()
             {
-                UserToken = SecureTokenHelper.GetUserToken()
+                UserToken = SecretTokenHelper.GetUserToken()
             };
             var reply = await client.ValidateTokenAsync(request);
 

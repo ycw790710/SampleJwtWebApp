@@ -35,9 +35,9 @@ namespace SampleAuthWebApp
                     options.ForwardDefaultSelector = context =>
                     {
                         string authorization = context.Request.Headers[HeaderNames.Authorization];
-                        if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith(SecureTokenHelper.ServerBearer))
+                        if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith(SecretTokenHelper.ServerBearer))
                         {
-                            return SecureTokenHelper.ServerBearer;
+                            return SecretTokenHelper.ServerBearer;
                         }
                         return JwtBearerDefaults.AuthenticationScheme;
                     };
@@ -50,17 +50,17 @@ namespace SampleAuthWebApp
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = SecureTokenHelper.Issuer,
-                        ValidAudiences = SecureTokenHelper.Audiences,
+                        ValidIssuer = SecretTokenHelper.Issuer,
+                        ValidAudiences = SecretTokenHelper.Audiences,
                         IssuerSigningKeyResolver = (string unvalidToken, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
                         {
 
-                           return new[] { new SymmetricSecurityKey(SecureTokenHelper.GetClientSecretKey()) };
+                           return new[] { new SymmetricSecurityKey(SecretTokenHelper.GetClientSecretKey()) };
                         },
                         ClockSkew = TimeSpan.Zero
                     };
                 })
-                .AddScheme<JwtBearerOptions, ServerTokenAuthenticationHandler2>(SecureTokenHelper.ServerBearer, SecureTokenHelper.ServerBearer, options =>
+                .AddScheme<JwtBearerOptions, ServerTokenAuthenticationHandler2>(SecretTokenHelper.ServerBearer, SecretTokenHelper.ServerBearer, options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -68,11 +68,11 @@ namespace SampleAuthWebApp
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = SecureTokenHelper.Issuer,
-                        ValidAudiences = SecureTokenHelper.Audiences,
+                        ValidIssuer = SecretTokenHelper.Issuer,
+                        ValidAudiences = SecretTokenHelper.Audiences,
                         IssuerSigningKeyResolver = (string unvalidToken, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
                         {
-                            return new[] { new SymmetricSecurityKey(SecureTokenHelper.GetServerSecretKey()) };
+                            return new[] { new SymmetricSecurityKey(SecretTokenHelper.GetServerSecretKey()) };
                         },
                         ClockSkew = TimeSpan.Zero
                     };
@@ -86,7 +86,7 @@ namespace SampleAuthWebApp
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SampleAuthWebApp Api", Version = "v1" });
                 c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
                 {
-                    Description = $"\"Authorization: {JwtBearerDefaults.AuthenticationScheme} {{token}}\" or \"Authorization: {SecureTokenHelper.ServerBearer} {{token}}\"",
+                    Description = $"\"Authorization: {JwtBearerDefaults.AuthenticationScheme} {{token}}\" or \"Authorization: {SecretTokenHelper.ServerBearer} {{token}}\"",
                     Name = HeaderNames.Authorization,
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,

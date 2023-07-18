@@ -26,7 +26,7 @@ namespace SampleJwtWebApp
                 })
                 .AddCallCredentials((context, metadata) =>
                 {
-                    metadata.Add(HeaderNames.Authorization, $"{SecureTokenHelper.ServerBearer} {SecureTokenHelper.GetServerToken()}");
+                    metadata.Add(HeaderNames.Authorization, $"{SecretTokenHelper.ServerBearer} {SecretTokenHelper.GetServerToken()}");
                     return Task.CompletedTask;
                 });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
