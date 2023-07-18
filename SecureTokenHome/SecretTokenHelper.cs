@@ -53,15 +53,15 @@ namespace SecureTokenHome
             var jwtSecurityToken = new JwtSecurityToken(
                 issuer: Issuer,
                 claims: claims,
-                expires: DateTime.Now.AddSeconds(5),
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512)
+                expires: DateTime.Now.AddSeconds(30),
+                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
             );
             return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
         }
         public static byte[] GetServerSecretKey()
         {
-            var bytes = Encoding.UTF8.GetBytes("askjdhasdgasdgaga2b52qbsdg5khns;lzdfh98sddfbu;12kjaiodhjgo;aihew4t-89q34nop;asdok;fg");
-            Array.Resize(ref bytes, 64);
+            var bytes = Encoding.UTF8.GetBytes("h3wasdgasdgaga2b52qbsdg5khns;lzdfh98sddfbu;12kjaiodhjgo;aihew4t-89q34nop;asdok;fg");
+            Array.Resize(ref bytes, 32);
             return bytes;
         }
         private static void AddAud(List<Claim> claims)
